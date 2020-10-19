@@ -42,4 +42,6 @@ end
         @test isposdef(Q0 + 1e-3*I)
         @test isposdef(Q + 1e-3*I)
     end
+
+    @test_throws ErrorException unscaled_precision_matrix(mesh, 1.0, 1.5)
 end

@@ -81,7 +81,13 @@ scaled to either a correlation matrix or have a particular marginal variance.
 function unscaled_precision_matrix(mesh::TriMesh, κ::Real, ν::Real)
     d = size(mesh.point, 1)
     α = ν + div(d, 2)
-    α::Integer
+    # Convert α to an integer to ensure that the precision matrix can be
+    # constructed
+    try
+        convert(Int, α)
+    catch
+        error("α = $α; Fractional α not implemented")
+    end
 
     C, C_tilde, G = component_matrices(mesh, κ)
     C_inv = spdiagm(0 => 1 ./ diag(C_tilde))
