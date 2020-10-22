@@ -23,6 +23,7 @@ r = 15 # decorrelation range
 σ = 5 # marginal variance
 ν = 2  # smoothness parameter
 
+C, Ctilde, G = component_matrices(mesh, 1.0)
 Q = precision_matrix(mesh, r, σ, ν)
 isposdef(Q)
 length(nnz(Q.data)) / length(Q)

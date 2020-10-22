@@ -9,7 +9,7 @@ method matrices C, C̃, and G as described in Lindgren et al. 2011.
 - `κ::Real`: Matérn correlation decay rate parameter
 
 # Returns
-- `(Matrix, Matrix, Matrix)`: the C, C̃, and G matrices, respectively
+- `(SparseMatrixCSC, Diagonal, SparseMatrixCSC)`: the C, C̃, and G matrices, respectively
 """
 function component_matrices(mesh::TriMesh, κ::Real)
     d = size(mesh.point, 1)
@@ -24,9 +24,15 @@ function component_matrices(mesh::TriMesh, κ::Real)
     ii = [ii; jj]
     jj = [jj; ii[1:n_edge]]
 
+    # TODO Possible to only fill in lower or upper triangle, then declare
+    # Symmetric?
+    # Need 2 * n_edge because each edge connects two edges and these
+    # are the only non-zero elements in these matrices
     G = sparse(ii, jj, zeros(2*n_edge))
     C = sparse(ii, jj, zeros(2*n_edge))
+    # TODO Use LinearAlgebra.Diagonal instead
     C_tilde = spdiagm(0 => zeros(mesh.n_point))
+    # C_tilde = Diagonal(zeros(mesh.n_point))
 
     for triangle in eachcol(mesh.cell)
         i, j, k = triangle
@@ -152,6 +158,7 @@ domain dimension, correlation distance, and marginal standard deviation.
 - `τ`: Precision matrix scaling parameter
 """
 calculate_τ(ν, d, κ, σ) = sqrt(gamma(ν) / (gamma(ν + d/2) * (4π)^(d/2))) / (σ * κ^ν)
+## TODO Check definition of τ here; Fuglstad 2018 gives inverse of this
 
 """
     precision_matrix(mesh::TriMesh, r::Real, σ::Real, ν::Integer)
